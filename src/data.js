@@ -1,7 +1,5 @@
 export async function getMetroData() {
-  const response = await fetch('/api/metro-data');
-
-  if (!response.ok) {
+const response = await fetch(`${import.meta.env.VITE_API_URL}/api/metro-data`);  if (!response.ok) {
     throw new Error('Unable to load metro data from MongoDB');
   }
 
