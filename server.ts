@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { createServer as createViteServer } from 'vite';
 import type { Document } from 'mongodb';
 import path from 'path';
@@ -26,11 +27,20 @@ async function getMetroDocument() {
     { upsert: true }
   );
 
-  return collection.findOne({ _id: METRO_DATA_ID }, { projection: { _id: 0 } });
+  return collection.findOne(
+    { _id: METRO_DATA_ID },
+    { projection: { _id: 0 } }
+  );
 }
 
 async function startServer() {
   const app = express();
+
+  // CORS FIX
+  app.use(cors({
+    origin: 'https://bmrcl-t9io.vercel.app',
+  }));
+
   const PORT = Number(process.env.PORT ?? DEFAULT_PORT);
   const HMR_PORT = Number(process.env.VITE_HMR_PORT ?? DEFAULT_HMR_PORT);
 
@@ -40,20 +50,26 @@ async function startServer() {
       res.json(data);
     } catch (error) {
       console.error('Failed to load metro data from MongoDB:', error);
-      res.status(500).json({ error: 'Failed to load metro data from MongoDB' });
+
+      res.status(500).json({
+        error: 'Failed to load metro data from MongoDB',
+      });
     }
   });
 
   app.get('/api/health/db', async (_req, res) => {
     try {
       const db = await getDb();
+
       await db.command({ ping: 1 });
+
       res.json({
         ok: true,
         database: db.databaseName,
       });
     } catch (error) {
       console.error('MongoDB health check failed:', error);
+
       res.status(500).json({
         ok: false,
         error: 'MongoDB connection failed',
@@ -67,7 +83,10 @@ async function startServer() {
       res.json(data?.timings ?? []);
     } catch (error) {
       console.error('Failed to load timings from MongoDB:', error);
-      res.status(500).json({ error: 'Failed to load timings from MongoDB' });
+
+      res.status(500).json({
+        error: 'Failed to load timings from MongoDB',
+      });
     }
   });
 
@@ -79,10 +98,13 @@ async function startServer() {
       },
       appType: 'spa',
     });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+
     app.use(express.static(distPath));
+
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
@@ -94,7 +116,10 @@ async function startServer() {
 
   server.on('error', (error: NodeJS.ErrnoException) => {
     if (error.code === 'EADDRINUSE') {
-      console.error(`Port ${PORT} is already in use. Stop the existing server or run with PORT=${PORT + 1}.`);
+      console.error(
+        `Port ${PORT} is already in use. Stop the existing server or run with PORT=${PORT + 1}.`
+      );
+
       process.exit(1);
     }
 
