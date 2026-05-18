@@ -37,9 +37,9 @@ async function startServer() {
   const app = express();
 
   // CORS FIX
-  app.use(cors({
-    origin: 'https://bmrcl-t9io.vercel.app',
-  }));
+ app.use(cors({
+  origin: '*',
+}));
 
   const PORT = Number(process.env.PORT ?? DEFAULT_PORT);
   const HMR_PORT = Number(process.env.VITE_HMR_PORT ?? DEFAULT_HMR_PORT);
