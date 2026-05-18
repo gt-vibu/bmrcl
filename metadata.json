@@ -1,0 +1,6 @@
+{
+  "name": "BMRCL Metro Nav",
+  "description": "Professional Bangalore Metro route planner with fare calculation, station lists, and interchange mapping.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
